@@ -1,0 +1,30 @@
+This file (inis.txt) is the IAEA INIS Thesaurus in textual form. I want you to convert it into JSON-LD SKOS.
+
+The thesaurus is composed of word blocks (called concept or term), listed alphabetically. Each word block begins with a descriptor and has only one descriptor. The descriptor is formatted as “<bold>MyDescriptor</bold>”, where MyDescriptor is the descriptor string.
+
+After that, we may have the introduction date of the descriptor for INIS and ETDE. For the introduction date, follow these guidelines: “The dates printed after each descriptor indicate when the term was introduced for use in the INIS database or in ETDEWEB. If only one date is given, the descriptor was introduced in both databases at the same time. If the descriptor is not followed by a date, it already existed in the Thesaurus before 30 June 1975.” Do this by using two data properties inis:introducedETDE and inis:introducedINIS with range xsd:date.
+
+After the introduction dates, there may be a descriptor definition, usually spanning multiple lines, before the relationship list. It can be converted using skos:definition annotation.
+
+After the definition, there may also be a comment, in the form of text in parentheses. In this case, the text in parentheses should be mapped as skos:historyNote, and refer to the text inside the parentheses.
+
+Use http://purl.org/connect-nm/inis as the base IRI, with prefix inis.
+
+Use these mapping rules:
+- USE / SEE X → the source term becomes skos:altLabel of the target concept X (no separate concept created for the source term).
+- UF / SF → skos:altLabel on the current concept.
+- BT → skos:broader
+- NT → skos:narrower
+- RT → skos:related
+
+When parsing the text, after a relationship (e.g., UF, NT) the value may continue on the next line. The conversion must be performed knowing that the value after a relationship ends only when, after a newline, there is another relationship or a descriptor (that is, <bold>). Remember that relationships are identified case-sensitively (e.g., “USE” at the beginning of a line is a valid relationship, while “Use” is the beginning or continuation of a comment).
+
+Please proceed with the conversion and provide a JSON-LD file.
+
+(OPTIONAL: remove all concepts that have no skos:narrower, broader, or related).
+
+Transform the JSON-LD file into an OWL 2 DL ontology in TTL format, with IRI http://purl.org/connect-nm/inis that also imports SKOS Core. Make the thesaurus concepts part of a SKOS concept scheme based on the attached PDF (inis_thesaurus_2018.pdf), which describes the INIS 2018 thesaurus (checking only the first 5 pages is sufficient).
+
+Define a criterion to identify the topConcepts and add them to the ontology. Make introducedINIS and introducedETDE subproperties of dcterms:created.
+
+Include all metadata that you can extract from the INIS Thesaurus 2018 preface as metadata in the ontology.
